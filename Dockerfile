@@ -1,4 +1,4 @@
-FROM ubuntu
+FROM nitiknirdorg/test:latest
 RUN apt-get update
 COPY testscript.sh /
 WORKDIR /

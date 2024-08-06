@@ -25,6 +25,7 @@ jobs:
           endpoint: "droyaltytestorg/default"
       - name: Build
         run: |
+          docker buildx ls
           docker buildx build --builder cloud-droyaltytestorg-default -t droyaltestorg/testing:latest .
       - name: Push
         run: |

@@ -23,11 +23,10 @@ jobs:
           version: "lab:latest"
           driver: cloud
           endpoint: "droyaltytestorg/default"
-      - name: Build
-        run: |
-          docker buildx ls
-          docker buildx build --builder cloud-droyaltytestorg-default -t droyaltestorg/testing:latest .
-      - name: Push
-        run: |
-          docker push droyaltestorg/testing:latest
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: "droyaltytestorg/tesgin:latest"
 

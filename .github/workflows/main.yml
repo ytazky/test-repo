@@ -20,7 +20,6 @@ jobs:
         with:
           driver: cloud
           endpoint: "dsasasa/new-builder"
-          install: true
       
       - name: Build and push
         uses: docker/build-push-action@v6

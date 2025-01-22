@@ -19,7 +19,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
         with:
           driver: cloud
-          endpoint: "dsasasa/default"
+          endpoint: "dsasasa/new-builder"
           install: true
       
       - name: Build and push

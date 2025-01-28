@@ -34,8 +34,7 @@ jobs:
           curl --silent -L --output ~/.docker/cli-plugins/docker-buildx $BUILDX_URL
           chmod a+x ~/.docker/cli-plugins/docker-buildx          
 
-      - run: echo $DOCKERHUB_TOKEN
-      - run: docker login --username $DOCKERHUB_USERNAME --password-stdin
+      - run: docker login --username $DOCKERHUB_USERNAME --password $DOCKERHUB_TOKEN
       - run: docker buildx create --use --driver cloud dsasasa/new-builder
 
       - run: |

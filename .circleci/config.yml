@@ -1,32 +1,50 @@
-orbs:
- docker: circleci/docker@1.5.0
 version: 2.1
-executors:
- docker-publisher: 
- environment:
- IMAGE_NAME: ndukwearm19docker/docker-node-app
- docker: # Each job requires specifying an executor
- # (either docker, macos, or machine), see
- — image: circleci/node:latest
- auth:
- username: $DOCKERHUB_USERNAME
- password: $DOCKERHUB_PASSWORD
 jobs:
- publishLatestToHub: 
- executor: docker-publisher
- 
- steps: 
- — checkout
- — setup_remote_docker
- — run: 
- name: Publish Docker Image to Docker Hub
- command: |
- echo “$DOCKERHUB_PASSWORD” | docker login -u “$DOCKERHUB_USERNAME” — password-stdin
- docker build -t $IMAGE_NAME .
- docker push $IMAGE_NAME:latest
-workflows:
- version: 2
- build-master:
- jobs:
- — publishLatestToHub
+  # Build multi-platform image and push to a registry
+  build_push:
+    machine:
+      image: ubuntu-2204:current
+    steps:
+      - checkout
 
+      - run: |
+          mkdir -vp ~/.docker/cli-plugins/
+          ARCH=amd64
+          BUILDX_URL=$(curl -s https://raw.githubusercontent.com/docker/actions-toolkit/main/.github/buildx-lab-releases.json | jq -r ".latest.assets[] | select(endswith(\"linux-$ARCH\"))")
+          curl --silent -L --output ~/.docker/cli-plugins/docker-buildx $BUILDX_URL
+          chmod a+x ~/.docker/cli-plugins/docker-buildx          
+
+      - run: echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
+      - run: docker buildx create --use --driver cloud dsasasa/new-builder
+
+      - run: |
+          docker buildx build           --platform linux/amd64,linux/arm64           --push           --tag "IMAGE" .          
+
+  # Build an image and discard the result
+  build_cache:
+    machine:
+      image: ubuntu-2204:current
+    steps:
+      - checkout
+
+      - run: |
+          mkdir -vp ~/.docker/cli-plugins/
+          ARCH=amd64
+          BUILDX_URL=$(curl -s https://raw.githubusercontent.com/docker/actions-toolkit/main/.github/buildx-lab-releases.json | jq -r ".latest.assets[] | select(endswith(\"linux-$ARCH\"))")
+          curl --silent -L --output ~/.docker/cli-plugins/docker-buildx $BUILDX_URL
+          chmod a+x ~/.docker/cli-plugins/docker-buildx          
+
+      - run: echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
+      - run: docker buildx create --use --driver cloud dsasasa/new-builder
+
+      - run: |
+          docker buildx build           --tag temp           --output type=cacheonly           .          
+
+workflows:
+  pull_request:
+    jobs:
+      - build_cache
+  release:
+    jobs:
+      - build_push
+  

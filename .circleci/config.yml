@@ -18,7 +18,7 @@ jobs:
       - run: docker buildx create --use --driver cloud dsasasa/new-builder
 
       - run: |
-          docker buildx build           --platform linux/amd64,linux/arm64           --push           --tag "tes" .          
+          docker buildx build           --platform linux/amd64,linux/arm64           --push           --tag "dsasasa/testing:test" .          
 
   # Build an image and discard the result
   build_cache:
